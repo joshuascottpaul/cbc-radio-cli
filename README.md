@@ -101,7 +101,6 @@ Note: `requirements.txt` includes optional tools (UI, tagging, whisper). Use `re
 ## Web UI (local)
 Run a local web UI that stays in sync with CLI options:
 ```bash
-python3 -m pip install --user -r requirements-web.txt
 cbc-radio-cli --web
 ```
 Then open: `http://127.0.0.1:8000`
@@ -109,7 +108,8 @@ Then open: `http://127.0.0.1:8000`
 Notes:
 - The web UI runs locally and calls the same CLI logic.
 - Interactive mode isn’t supported yet in the web UI (use list/summary or non-interactive flags).
- - You can set `--web-host` and `--web-port` if needed.
+- You can set `--web-host` and `--web-port` if needed.
+- If web deps are missing, the CLI will print a one‑liner install command.
 
 ## Usage (full)
 

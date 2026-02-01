@@ -37,7 +37,7 @@ python3 -m pip install --user -r requirements.txt
 ./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073
 ```
 
-Note: `requirements.txt` includes optional tools (UI, tagging, whisper). Remove any you don’t want.
+Note: `requirements.txt` includes optional tools (UI, tagging, whisper). Use `requirements-min.txt` to skip whisper.
 
 ## Usage (full)
 

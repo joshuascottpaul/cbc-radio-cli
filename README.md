@@ -21,6 +21,8 @@ Optional (nice UI):
 ```bash
 brew install python yt-dlp ffmpeg
 python3 -m pip install --user -r requirements.txt
+# or, minimal (no whisper)
+python3 -m pip install --user -r requirements-min.txt
 ```
 
 ## Install (pipx)
@@ -28,12 +30,16 @@ python3 -m pip install --user -r requirements.txt
 pipx install yt-dlp
 brew install ffmpeg
 python3 -m pip install --user -r requirements.txt
+# or, minimal (no whisper)
+python3 -m pip install --user -r requirements-min.txt
 ```
 
 ## Quickstart
 ```bash
 brew install yt-dlp ffmpeg
 python3 -m pip install --user -r requirements.txt
+# or, minimal (no whisper)
+python3 -m pip install --user -r requirements-min.txt
 ./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073
 ```
 

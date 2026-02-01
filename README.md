@@ -20,6 +20,10 @@ Optional (nice UI):
 
 ## Install (brew)
 ```bash
+brew tap joshuascottpaul/cbc-radio-cli
+brew install cbc-radio-cli
+
+# Optional: if you want to run from source instead of the Homebrew binary
 brew install python yt-dlp ffmpeg
 python3 -m pip install --user -r requirements.txt
 # or, minimal (no whisper)
@@ -338,3 +342,8 @@ If you don’t have `pytest` installed, use:
 ```bash
 brew install pytest
 ```
+
+## Homebrew release flow (maintainers)
+1) Create a GitHub release/tag (e.g., `v0.2.0`) in `cbc-radio-cli`.
+2) The `Update Homebrew Tap` workflow updates the tap formula automatically.
+3) Ensure `HOMEBREW_TAP_TOKEN` secret is set with `repo` scope for the tap repo.

@@ -1,0 +1,5 @@
+rich
+alive-progress
+yaspin
+mutagen
+openai-whisper

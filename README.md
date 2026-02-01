@@ -15,20 +15,31 @@ Optional (nice UI):
 - `yaspin` (spinner fallback)
 - `mutagen` (ID3 tagging)
 - `whisper` CLI (transcription)
+- `ffmpeg` (required for clip transcription)
 
 ## Install (brew)
 ```bash
-brew install python yt-dlp
-python3 -m pip install --user rich alive-progress yaspin mutagen
+brew install python yt-dlp ffmpeg
+python3 -m pip install --user -r requirements.txt
 ```
 
 ## Install (pipx)
 ```bash
 pipx install yt-dlp
-python3 -m pip install --user rich alive-progress yaspin mutagen
+brew install ffmpeg
+python3 -m pip install --user -r requirements.txt
 ```
 
-## Usage
+## Quickstart
+```bash
+brew install yt-dlp ffmpeg
+python3 -m pip install --user -r requirements.txt
+./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073
+```
+
+Note: `requirements.txt` includes optional tools (UI, tagging, whisper). Remove any you don’t want.
+
+## Usage (full)
 
 Basic download:
 ```bash

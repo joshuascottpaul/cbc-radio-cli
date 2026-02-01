@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CBC Radio CLI — Web</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-slate-50 text-slate-900">
+    <div class="max-w-5xl mx-auto px-6 py-10">
+      <header class="mb-8">
+        <h1 class="text-3xl font-semibold">CBC Audio Downloader (Web)</h1>
+        <p class="text-slate-600 mt-2">
+          Runs locally and calls the same CLI logic. Fill in options you want; everything else uses defaults.
+        </p>
+      </header>
+
+      <form method="post" action="/run" class="space-y-8">
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <h2 class="text-xl font-semibold mb-4">URL</h2>
+          <label class="block text-sm font-medium text-slate-700 mb-2">CBC URL</label>
+          <input
+            type="url"
+            name="url"
+            required
+            placeholder="https://www.cbc.ca/radio/ideas/..."
+            class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold">Options</h2>
+            <span class="text-sm text-slate-500">All CLI flags are available</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for field in fields %}
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                  {{ field.label }}
+                </label>
+                {% if field.kind == "checkbox" %}
+                  <label class="inline-flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      name="{{ field.name }}"
+                      value="1"
+                      class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                    />
+                    <span class="text-sm text-slate-600">{{ field.help }}</span>
+                  </label>
+                {% elif field.kind == "select" %}
+                  <select
+                    name="{{ field.name }}"
+                    class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    <option value="">(default)</option>
+                    {% for choice in field.choices %}
+                      <option value="{{ choice }}">{{ choice }}</option>
+                    {% endfor %}
+                  </select>
+                  {% if field.help %}
+                    <p class="text-xs text-slate-500 mt-1">{{ field.help }}</p>
+                  {% endif %}
+                {% else %}
+                  <input
+                    type="{{ field.kind }}"
+                    name="{{ field.name }}"
+                    placeholder="{{ field.placeholder }}"
+                    class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                  {% if field.help %}
+                    <p class="text-xs text-slate-500 mt-1">{{ field.help }}</p>
+                  {% endif %}
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </section>
+
+        <div class="flex items-center gap-3">
+          <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-indigo-700">
+            Run
+          </button>
+          <a href="/jobs" class="text-sm text-indigo-600 hover:underline">View recent runs</a>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

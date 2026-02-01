@@ -31,6 +31,7 @@ Homebrew tap repo: https://github.com/joshuascottpaul/homebrew-cbc-radio-cli
 - [Install (from source)](#install-from-source)
 - [Install (pipx)](#install-pipx)
 - [Quickstart](#quickstart)
+- [Web UI (local)](#web-ui-local)
 - [Usage (full)](#usage-full)
 - [From source usage (short)](#from-source-usage-short)
 - [CLI options (highlights)](#cli-options-highlights)
@@ -87,6 +88,18 @@ cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairn
 ```
 
 Note: `requirements.txt` includes optional tools (UI, tagging, whisper). Use `requirements-min.txt` to skip whisper.
+
+## Web UI (local)
+Run a local web UI that stays in sync with CLI options:
+```bash
+python3 -m pip install --user -r requirements-web.txt
+python3 cbc_radio_web.py
+```
+Then open: `http://127.0.0.1:8000`
+
+Notes:
+- The web UI runs locally and calls the same CLI logic.
+- Interactive mode isn’t supported yet in the web UI (use list/summary or non-interactive flags).
 
 ## Usage (full)
 

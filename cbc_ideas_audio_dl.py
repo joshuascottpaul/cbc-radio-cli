@@ -1073,7 +1073,7 @@ def transcribe_audio(
     return rc
 
 
-def main():
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Download CBC audio from a story or section URL using yt-dlp.",
         epilog=(
@@ -1124,8 +1124,10 @@ def main():
     parser.add_argument("--browse-stories", action="store_true", help="Treat URL as a section and choose a story")
     parser.add_argument("--story-list", type=int, metavar="N", help="List top N discovered stories and exit")
     parser.add_argument("--show-list", type=int, metavar="N", help="List top N discovered shows and exit")
-    args = parser.parse_args()
+    return parser
 
+
+def run(args: argparse.Namespace) -> int:
     if args.completion:
         print(completion_script(args.completion))
         return 0
@@ -1547,6 +1549,12 @@ def main():
         (record_dir / "feed.xml").write_text(feed_xml, encoding="utf-8")
 
     return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    return run(args)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,7 @@
 # CBC Audio Downloader
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+
 Download CBC audio from a story URL by resolving the matching podcast episode and handing the enclosure URL to `yt-dlp`.
 
 ## Requirements

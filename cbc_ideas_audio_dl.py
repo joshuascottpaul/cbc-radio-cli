@@ -37,7 +37,7 @@ USER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36"
 )
-__version__ = "0.1.4"
+__version__ = "0.1.5"
 DEFAULT_SHOW = "ideas"
 
 PROVIDERS = {
@@ -1157,9 +1157,16 @@ def run(args: argparse.Namespace) -> int:
             local_hint = None
             with contextlib.suppress(Exception):
                 script_path = Path(__file__).resolve()
-                local_req = script_path.parent / "requirements-web.txt"
-                if local_req.exists():
-                    local_hint = f"python3 -m pip install --user -r {local_req}"
+                candidates = [
+                    script_path.parent / "requirements-web.txt",
+                    script_path.parent / "share" / "cbc-radio-cli" / "requirements-web.txt",
+                    Path("/opt/homebrew/share/cbc-radio-cli/requirements-web.txt"),
+                    Path("/usr/local/share/cbc-radio-cli/requirements-web.txt"),
+                ]
+                for local_req in candidates:
+                    if local_req.exists():
+                        local_hint = f"python3 -m pip install --user -r {local_req}"
+                        break
             hint_lines = [
                 "Web UI dependencies missing.",
                 "Install with:",

@@ -35,12 +35,15 @@ _jobs_lock = threading.Lock()
 def _parser_fields() -> list[dict[str, Any]]:
     parser = build_parser()
     fields: list[dict[str, Any]] = []
+    skip_options = {"--web", "--web-host", "--web-port", "--version", "--completion"}
     for action in parser._actions:
         if not action.option_strings:
             continue
         if action.dest == "help":
             continue
         option = action.option_strings[-1]
+        if option in skip_options:
+            continue
         name = option.lstrip("-").replace("-", "_")
         help_text = action.help or ""
         if isinstance(action, argparse._StoreTrueAction):
@@ -169,10 +172,14 @@ def job_status(job_id: str):
         )
 
 
-def main():
+def run_web(host: str = "127.0.0.1", port: int = 8000) -> None:
     import uvicorn
 
-    uvicorn.run("cbc_radio_web:app", host="127.0.0.1", port=8000, reload=False)
+    uvicorn.run("cbc_radio_web:app", host=host, port=port, reload=False)
+
+
+def main():
+    run_web()
 
 
 if __name__ == "__main__":

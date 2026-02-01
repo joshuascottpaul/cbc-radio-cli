@@ -6,6 +6,14 @@
 
 Download CBC audio from CBC story or section URLs with one command. This tool resolves the correct podcast episode behind a story page, fetches the RSS enclosure URL, and hands it to `yt-dlp` so you get a clean audio file without digging through feeds or page HTML.
 
+First 60 seconds:
+```bash
+brew tap joshuascottpaul/cbc-radio-cli
+brew install cbc-radio-cli
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073
+cbc-radio-cli --web
+```
+
 Why this exists:
 - CBC pages don’t always link directly to the audio file.
 - The audio often lives in a show’s RSS feed, not on the story page.
@@ -36,6 +44,7 @@ Homebrew tap repo: https://github.com/joshuascottpaul/homebrew-cbc-radio-cli
 - [From source usage (short)](#from-source-usage-short)
 - [CLI options (highlights)](#cli-options-highlights)
 - [Notes](#notes)
+- [Troubleshooting](#troubleshooting)
 - [Cheatsheet](#cheatsheet)
 - [Sample usage (all commands)](#sample-usage-all-commands)
 - [Tests](#tests)
@@ -93,13 +102,14 @@ Note: `requirements.txt` includes optional tools (UI, tagging, whisper). Use `re
 Run a local web UI that stays in sync with CLI options:
 ```bash
 python3 -m pip install --user -r requirements-web.txt
-python3 cbc_radio_web.py
+cbc-radio-cli --web
 ```
 Then open: `http://127.0.0.1:8000`
 
 Notes:
 - The web UI runs locally and calls the same CLI logic.
 - Interactive mode isn’t supported yet in the web UI (use list/summary or non-interactive flags).
+ - You can set `--web-host` and `--web-port` if needed.
 
 ## Usage (full)
 
@@ -148,7 +158,7 @@ cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairn
 - `--no-download` resolve only
 - `--print-url` print the enclosure URL
 - `--output` set `yt-dlp` output template
-- `--output-dir` set `yt-dlp` output directory
+- `--output-dir` set `yt-dlp` output directory (default: `./downloads`)
 - `--audio-format` set format for `yt-dlp` (default `mp3`)
 - `--format` pass a format selector to `yt-dlp`
 - `--tag` tag MP3s with ID3 metadata (requires `mutagen`)
@@ -167,6 +177,10 @@ cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairn
 - `--story-list N` list top N discovered stories and exit
 - `--show-list N` list top N discovered shows and exit (section URLs)
 - `--non-interactive` never prompt; requires `--list` or `--summary` to pick an item
+- `--web` launch local web UI
+- `--web-host` host for web UI (default `127.0.0.1`)
+- `--web-port` port for web UI (default `8000`)
+- `--version` print version and exit
 
 ## Notes
 - Matching is heuristic (token overlap + Part number + date proximity). If it ever misses, use `--title` or `--rss-url`.
@@ -182,6 +196,12 @@ cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairn
 - Transcribe-only downloads audio first, runs whisper, then deletes the audio file.
 - Clip transcription requires `ffmpeg` in PATH.
 - Use either `--transcribe-end` or `--transcribe-duration` (not both).
+- Runs locally; no data is sent anywhere unless you choose to.
+
+## Troubleshooting
+- `ffmpeg not found`: install via `brew install ffmpeg`.
+- `whisper not found`: install `openai-whisper` (or use `requirements.txt`).
+- `No RSS found`: try `--rss-url` or `--title` to help matching.
 
 ## Cheatsheet
 
@@ -209,6 +229,8 @@ cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairn
 | Action prompt | `cbc-radio-cli https://www.cbc.ca/radio/ --interactive` |
 
 ## Sample usage (all commands)
+<details>
+<summary>Expand all examples</summary>
 
 Basic download
 ```bash
@@ -389,6 +411,8 @@ Shell completion
 ```bash
 cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --completion zsh
 ```
+
+</details>
 
 ## Tests
 ```bash

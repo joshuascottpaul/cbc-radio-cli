@@ -36,6 +36,7 @@ USER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36"
 )
+__version__ = "0.1.2"
 DEFAULT_SHOW = "ideas"
 
 PROVIDERS = {
@@ -616,7 +617,7 @@ def completion_script(shell: str) -> str:
         return """_cbc_audio_complete() {
   local cur
   cur="${COMP_WORDS[COMP_CWORD]}"
-  COMPREPLY=( $(compgen -W "--dry-run --show --rss-url --provider --title --verbose --list --json --no-download --print-url --audio-format --format --output --output-dir --cache-ttl --completion --interactive --non-interactive --tag --no-tag --transcribe --debug --debug-dir --record --repair --rss-discover-only --summary --browse-stories --story-list --show-list" -- "$cur") )
+  COMPREPLY=( $(compgen -W "--dry-run --show --rss-url --provider --title --verbose --list --json --no-download --print-url --audio-format --format --output --output-dir --cache-ttl --completion --interactive --non-interactive --tag --no-tag --transcribe --debug --debug-dir --record --repair --rss-discover-only --summary --browse-stories --story-list --show-list --web --web-host --web-port --version" -- "$cur") )
 }
 complete -F _cbc_audio_complete cbc_ideas_audio_dl.py
 """
@@ -653,7 +654,11 @@ _arguments \
   '--summary[Top N matches summary]:N:' \
   '--browse-stories' \
   '--story-list[Top N stories]:N:' \
-  '--show-list[Top N shows]:N:'
+  '--show-list[Top N shows]:N:' \
+  '--web[Launch local web UI]' \
+  '--web-host[Web UI host]:host:' \
+  '--web-port[Web UI port]:port:' \
+  '--version[Print version and exit]'
 """
     if shell == "fish":
         return """complete -c cbc_ideas_audio_dl.py -l dry-run
@@ -686,6 +691,10 @@ complete -c cbc_ideas_audio_dl.py -l summary -r
 complete -c cbc_ideas_audio_dl.py -l browse-stories
 complete -c cbc_ideas_audio_dl.py -l story-list -r
 complete -c cbc_ideas_audio_dl.py -l show-list -r
+complete -c cbc_ideas_audio_dl.py -l web
+complete -c cbc_ideas_audio_dl.py -l web-host -r
+complete -c cbc_ideas_audio_dl.py -l web-port -r
+complete -c cbc_ideas_audio_dl.py -l version
 """
     raise ValueError("Unsupported shell for completion")
 
@@ -1088,7 +1097,7 @@ def build_parser() -> argparse.ArgumentParser:
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("url", help="CBC story or section URL (e.g., https://www.cbc.ca/radio/ideas/...)")
+    parser.add_argument("url", nargs="?", help="CBC story or section URL (e.g., https://www.cbc.ca/radio/ideas/...)")
     parser.add_argument("--dry-run", action="store_true", help="Print the resolved enclosure URL and exit")
     parser.add_argument("--show", help="Override show slug for RSS feed (default: ideas)")
     parser.add_argument("--rss-url", help="Override RSS URL directly")
@@ -1102,7 +1111,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--audio-format", default="mp3", help="Audio format for yt-dlp (default: mp3)")
     parser.add_argument("--format", dest="ytdlp_format", help="Pass a format selector to yt-dlp")
     parser.add_argument("--output", help="Output template for yt-dlp (-o)")
-    parser.add_argument("--output-dir", help="Output directory for yt-dlp (-P)")
+    parser.add_argument("--output-dir", default="./downloads", help="Output directory for yt-dlp (-P)")
     parser.add_argument("--cache-ttl", type=int, default=3600, help="Cache TTL in seconds (default: 3600)")
     parser.add_argument("--completion", choices=["bash", "zsh", "fish"], help="Print shell completion script")
     parser.add_argument("--interactive", action="store_true", help="Prompt to choose if match is ambiguous")
@@ -1124,13 +1133,41 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--browse-stories", action="store_true", help="Treat URL as a section and choose a story")
     parser.add_argument("--story-list", type=int, metavar="N", help="List top N discovered stories and exit")
     parser.add_argument("--show-list", type=int, metavar="N", help="List top N discovered shows and exit")
+    parser.add_argument("--web", action="store_true", help="Launch local web UI")
+    parser.add_argument("--web-host", default="127.0.0.1", help="Web UI host (default: 127.0.0.1)")
+    parser.add_argument("--web-port", type=int, default=8000, help="Web UI port (default: 8000)")
+    parser.add_argument("--version", action="store_true", help="Print version and exit")
     return parser
 
 
 def run(args: argparse.Namespace) -> int:
+    if args.version:
+        print(__version__)
+        return 0
+    if args.web:
+        try:
+            import importlib
+
+            importlib.import_module("fastapi")
+            importlib.import_module("uvicorn")
+            importlib.import_module("jinja2")
+        except Exception:
+            print(
+                "Web UI dependencies missing. Install with:\n"
+                "  python3 -m pip install --user -r requirements-web.txt",
+                file=sys.stderr,
+            )
+            return 2
+        from cbc_radio_web import run_web
+
+        run_web(host=args.web_host, port=args.web_port)
+        return 0
     if args.completion:
         print(completion_script(args.completion))
         return 0
+    if not args.url:
+        print("Error: URL is required.", file=sys.stderr)
+        return 2
 
     if not ensure_yt_dlp() and not (args.dry_run or args.no_download or args.print_url or args.list):
         print("Error: yt-dlp not found in PATH.", file=sys.stderr)

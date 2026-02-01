@@ -329,7 +329,11 @@ Shell completion
 ./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --completion zsh
 ```
 
-Run tests
+## Tests
 ```bash
-python3 -m unittest /Users/jpaul/Desktop/tests/test_cbc_ideas_audio_dl.py
+pytest -q
+```
+If you don’t have `pytest` installed, use:
+```bash
+brew install pytest
 ```

@@ -4,7 +4,17 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Homebrew Tap](https://img.shields.io/badge/Homebrew-Tap-brightgreen.svg)](https://github.com/joshuascottpaul/homebrew-cbc-radio-cli)
 
-Download CBC audio from a story URL by resolving the matching podcast episode and handing the enclosure URL to `yt-dlp`.
+Download CBC audio from CBC story or section URLs with one command. This tool resolves the correct podcast episode behind a story page, fetches the RSS enclosure URL, and hands it to `yt-dlp` so you get a clean audio file without digging through feeds or page HTML.
+
+Why this exists:
+- CBC pages don’t always link directly to the audio file.
+- The audio often lives in a show’s RSS feed, not on the story page.
+- Manually finding the right episode is slow and error‑prone.
+
+Common use cases:
+- Save an Ideas episode referenced in a story URL.
+- Browse a section and pick a story to download.
+- Build a local archive or send audio to a transcription pipeline.
 
 Quick install:
 ```bash

@@ -1,0 +1,38 @@
+name: Update Homebrew Tap
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  update-tap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set variables
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          echo "TARBALL_URL=https://github.com/joshuascottpaul/cbc-radio-cli/archive/refs/tags/${TAG}.tar.gz" >> "$GITHUB_ENV"
+      - name: Compute SHA256
+        run: |
+          curl -L -o src.tar.gz "$TARBALL_URL"
+          echo "SHA256=$(sha256sum src.tar.gz | awk '{print $1}')" >> "$GITHUB_ENV"
+      - name: Checkout tap repo
+        uses: actions/checkout@v4
+        with:
+          repository: joshuascottpaul/homebrew-cbc-radio-cli
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          path: tap
+      - name: Update formula
+        run: |
+          formula="tap/Formula/cbc-radio-cli.rb"
+          sed -i -E "s|^  url \".*\"|  url \"${TARBALL_URL}\"|" "$formula"
+          sed -i -E "s|^  sha256 \".*\"|  sha256 \"${SHA256}\"|" "$formula"
+      - name: Commit and push
+        run: |
+          cd tap
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add Formula/cbc-radio-cli.rb
+          git commit -m "Update cbc-radio-cli to ${TAG}" || exit 0
+          git push

@@ -87,6 +87,11 @@ Generate shell completion:
 cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --completion zsh
 ```
 
+## From source usage (short)
+```bash
+./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073
+```
+
 ## CLI options (highlights)
 - `--provider` preset show slug (`ideas`, `thecurrent`, `q`, `asithappens`, `day6`)
 - `--show` override the RSS show slug

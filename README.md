@@ -1,5 +1,6 @@
 # CBC Audio Downloader
 
+[![CI](https://github.com/joshuascottpaul/cbc-radio-cli/actions/workflows/tests.yml/badge.svg)](https://github.com/joshuascottpaul/cbc-radio-cli/actions/workflows/tests.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 Download CBC audio from a story URL by resolving the matching podcast episode and handing the enclosure URL to `yt-dlp`.

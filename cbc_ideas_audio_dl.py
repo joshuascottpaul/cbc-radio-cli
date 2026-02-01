@@ -1152,11 +1152,22 @@ def run(args: argparse.Namespace) -> int:
             importlib.import_module("uvicorn")
             importlib.import_module("jinja2")
         except Exception:
-            print(
-                "Web UI dependencies missing. Install with:\n"
-                "  python3 -m pip install --user -r requirements-web.txt",
-                file=sys.stderr,
-            )
+            fallback = "python3 -m pip install --user -r https://raw.githubusercontent.com/joshuascottpaul/cbc-radio-cli/main/requirements-web.txt"
+            local_hint = None
+            with contextlib.suppress(Exception):
+                script_path = Path(__file__).resolve()
+                local_req = script_path.parent / "requirements-web.txt"
+                if local_req.exists():
+                    local_hint = f"python3 -m pip install --user -r {local_req}"
+            hint_lines = [
+                "Web UI dependencies missing.",
+                "Install with:",
+            ]
+            if local_hint:
+                hint_lines.append(f"  {local_hint}")
+                hint_lines.append("or")
+            hint_lines.append(f"  {fallback}")
+            print("\n".join(hint_lines), file=sys.stderr)
             return 2
         from cbc_radio_web import run_web
 

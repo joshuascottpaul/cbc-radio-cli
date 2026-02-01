@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/joshuascottpaul/cbc-radio-cli/actions/workflows/tests.yml/badge.svg)](https://github.com/joshuascottpaul/cbc-radio-cli/actions/workflows/tests.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Homebrew Tap](https://img.shields.io/badge/Homebrew-Tap-brightgreen.svg)](https://github.com/joshuascottpaul/homebrew-cbc-radio-cli)
 
 Download CBC audio from a story URL by resolving the matching podcast episode and handing the enclosure URL to `yt-dlp`.
 
@@ -12,7 +13,22 @@ brew install cbc-radio-cli
 cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073
 ```
 
-Homebrew tap repo: `https://github.com/joshuascottpaul/homebrew-cbc-radio-cli`
+Homebrew tap repo: https://github.com/joshuascottpaul/homebrew-cbc-radio-cli
+
+## Table of contents
+- [Requirements](#requirements)
+- [Install (brew)](#install-brew)
+- [Install (from source)](#install-from-source)
+- [Install (pipx)](#install-pipx)
+- [Quickstart](#quickstart)
+- [Usage (full)](#usage-full)
+- [From source usage (short)](#from-source-usage-short)
+- [CLI options (highlights)](#cli-options-highlights)
+- [Notes](#notes)
+- [Cheatsheet](#cheatsheet)
+- [Sample usage (all commands)](#sample-usage-all-commands)
+- [Tests](#tests)
+- [Homebrew release flow (maintainers)](#homebrew-release-flow-maintainers)
 
 ## Requirements
 - Python 3.11+
@@ -57,8 +73,6 @@ python3 -m pip install --user -r requirements-min.txt
 
 ## Quickstart
 ```bash
-brew tap joshuascottpaul/cbc-radio-cli
-brew install cbc-radio-cli
 cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073
 ```
 

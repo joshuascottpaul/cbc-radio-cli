@@ -509,6 +509,52 @@ class TestCliFlags(unittest.TestCase):
         self.assertEqual(rc, 2)
         self.assertIn("end", err.lower())
 
+    def test_transcribe_end_before_start(self):
+        story = (FIXTURE_DIR / "story.html").read_text(encoding="utf-8")
+        feed = (FIXTURE_DIR / "feed.xml").read_text(encoding="utf-8")
+        with mock.patch.object(cbc, "run_ytdlp", return_value=0), \
+             mock.patch.object(cbc, "get_expected_filepath", return_value="/tmp/fake.mp3"), \
+             mock.patch.object(cbc, "transcribe_audio", return_value=True):
+            rc, _out, err = self.run_main(
+                [
+                    "cbc_ideas_audio_dl.py",
+                    "https://example.com/story-1.123",
+                    "--transcribe",
+                    "--transcribe-start",
+                    "10",
+                    "--transcribe-end",
+                    "5",
+                ],
+                {"https://example.com/story-1.123": story, "https://www.cbc.ca/podcasting/includes/ideas.xml": feed},
+                force_story=True,
+            )
+        self.assertEqual(rc, 2)
+        self.assertIn("after", err.lower())
+
+    def test_transcribe_failure_is_error(self):
+        story = (FIXTURE_DIR / "story.html").read_text(encoding="utf-8")
+        feed = (FIXTURE_DIR / "feed.xml").read_text(encoding="utf-8")
+        with mock.patch.object(cbc, "run_ytdlp", return_value=0), \
+             mock.patch.object(cbc, "get_expected_filepath", return_value="/tmp/fake.mp3"), \
+             mock.patch.object(cbc, "transcribe_audio", return_value=False):
+            rc, _out, err = self.run_main(
+                ["cbc_ideas_audio_dl.py", "https://example.com/story-1.123", "--transcribe"],
+                {"https://example.com/story-1.123": story, "https://www.cbc.ca/podcasting/includes/ideas.xml": feed},
+                force_story=True,
+            )
+        self.assertEqual(rc, 2)
+        self.assertIn("transcription failed", err.lower())
+
+    def test_story_list_handles_single_quotes(self):
+        section_html = "<a href='/radio/ideas/story-one-1.111'>Story One</a>"
+        fetch_map = {"https://example.com/section": section_html, "https://www.cbc.ca/podcasting/": ""}
+        rc, out, _err = self.run_main(
+            ["cbc_ideas_audio_dl.py", "https://example.com/section", "--story-list", "1", "--json"],
+            fetch_map,
+        )
+        self.assertEqual(rc, 0)
+        self.assertIn("story-one-1.111", out)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -540,7 +540,7 @@ def strip_tags(text: str) -> str:
 def discover_story_links(html: str) -> list[StoryItem]:
     items: list[StoryItem] = []
     seen: set[str] = set()
-    pattern = re.compile(r'<a[^>]+href="(/radio/[^"]+-1\.\d+[^"]*)"[^>]*>(.*?)</a>', re.IGNORECASE | re.DOTALL)
+    pattern = re.compile(r'<a[^>]+href=[\'"](/radio/[^\'"]+-1\.\d+[^\'"]*)[\'"][^>]*>(.*?)</a>', re.IGNORECASE | re.DOTALL)
     for href, inner in pattern.findall(html):
         url = f"https://www.cbc.ca{href}"
         if url in seen:
@@ -1514,13 +1514,16 @@ def main():
         if clip_end is not None and clip_duration is not None:
             print("Error: use --transcribe-end or --transcribe-duration, not both.", file=sys.stderr)
             return 2
+        if clip_start is not None and clip_end is not None and clip_end <= clip_start:
+            print("Error: --transcribe-end must be after --transcribe-start.", file=sys.stderr)
+            return 2
         if clip_start is None and clip_end is None and clip_duration is not None:
             clip_start = 0.0
         if clip_start is not None or clip_end is not None or clip_duration is not None:
             if not shutil.which("ffmpeg"):
                 print("Error: ffmpeg not found in PATH (required for clip transcription).", file=sys.stderr)
                 return 2
-        transcribe_audio(
+        transcribe_ok = transcribe_audio(
             expected_path,
             args.transcribe_dir,
             args.transcribe_model,
@@ -1528,6 +1531,9 @@ def main():
             clip_end,
             clip_duration,
         )
+        if not transcribe_ok:
+            print("Error: transcription failed.", file=sys.stderr)
+            return 2
         if delete_audio_after_transcribe:
             try:
                 os.remove(expected_path)

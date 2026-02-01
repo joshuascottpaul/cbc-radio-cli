@@ -5,6 +5,15 @@
 
 Download CBC audio from a story URL by resolving the matching podcast episode and handing the enclosure URL to `yt-dlp`.
 
+Quick install:
+```bash
+brew tap joshuascottpaul/cbc-radio-cli
+brew install cbc-radio-cli
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073
+```
+
+Homebrew tap repo: `https://github.com/joshuascottpaul/homebrew-cbc-radio-cli`
+
 ## Requirements
 - Python 3.11+
 - `yt-dlp` in your PATH

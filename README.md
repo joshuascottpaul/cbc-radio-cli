@@ -22,8 +22,15 @@ Optional (nice UI):
 ```bash
 brew tap joshuascottpaul/cbc-radio-cli
 brew install cbc-radio-cli
+```
 
-# Optional: if you want to run from source instead of the Homebrew binary
+Then run:
+```bash
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073
+```
+
+## Install (from source)
+```bash
 brew install python yt-dlp ffmpeg
 python3 -m pip install --user -r requirements.txt
 # or, minimal (no whisper)
@@ -41,11 +48,9 @@ python3 -m pip install --user -r requirements-min.txt
 
 ## Quickstart
 ```bash
-brew install yt-dlp ffmpeg
-python3 -m pip install --user -r requirements.txt
-# or, minimal (no whisper)
-python3 -m pip install --user -r requirements-min.txt
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073
+brew tap joshuascottpaul/cbc-radio-cli
+brew install cbc-radio-cli
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073
 ```
 
 Note: `requirements.txt` includes optional tools (UI, tagging, whisper). Use `requirements-min.txt` to skip whisper.
@@ -54,32 +59,32 @@ Note: `requirements.txt` includes optional tools (UI, tagging, whisper). Use `re
 
 Basic download:
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073
 ```
 
 Browse a section (use RSS feed when available, pick an episode interactively):
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ --interactive
+cbc-radio-cli https://www.cbc.ca/radio/ --interactive
 ```
 
 Resolve URL only:
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --dry-run
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --dry-run
 ```
 
 List top matches:
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --list 5
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --list 5
 ```
 
 JSON output for scripting:
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --print-url --json
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --print-url --json
 ```
 
 Generate shell completion:
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --completion zsh
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --completion zsh
 ```
 
 ## CLI options (highlights)
@@ -131,207 +136,207 @@ Generate shell completion:
 
 | Goal | Command |
 | --- | --- |
-| Download audio | `./cbc_ideas_audio_dl.py <URL>` |
-| Resolve URL only | `./cbc_ideas_audio_dl.py <URL> --dry-run` |
-| List top matches | `./cbc_ideas_audio_dl.py <URL> --list 5` |
-| Interactive pick | `./cbc_ideas_audio_dl.py <URL> --interactive` |
-| Print URL (JSON) | `./cbc_ideas_audio_dl.py <URL> --print-url --json` |
-| Override RSS | `./cbc_ideas_audio_dl.py <URL> --rss-url <RSS>` |
-| Custom output dir | `./cbc_ideas_audio_dl.py <URL> --output-dir ./downloads` |
-| Tag MP3 | `./cbc_ideas_audio_dl.py <URL> --tag` |
-| Transcribe | `./cbc_ideas_audio_dl.py <URL> --transcribe` |
-| Transcribe to dir | `./cbc_ideas_audio_dl.py <URL> --transcribe --transcribe-dir ./transcripts` |
-| Whisper model | `./cbc_ideas_audio_dl.py <URL> --transcribe --transcribe-model small` |
-| Transcribe first 30s | `./cbc_ideas_audio_dl.py <URL> --transcribe --transcribe-duration 30` |
-| Transcribe range | `./cbc_ideas_audio_dl.py <URL> --transcribe --transcribe-start 25:31 --transcribe-end 35:00` |
-| Debug archive | `./cbc_ideas_audio_dl.py <URL> --debug` |
-| Browse a section | `./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ --interactive` |
-| Browse stories (force story list) | `./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ --browse-stories --interactive` |
-| List section feed | `./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ --list 10` |
-| List stories | `./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ --story-list 10` |
-| List shows | `./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ --show-list 10` |
-| Action prompt | `./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ --interactive` |
+| Download audio | `cbc-radio-cli <URL>` |
+| Resolve URL only | `cbc-radio-cli <URL> --dry-run` |
+| List top matches | `cbc-radio-cli <URL> --list 5` |
+| Interactive pick | `cbc-radio-cli <URL> --interactive` |
+| Print URL (JSON) | `cbc-radio-cli <URL> --print-url --json` |
+| Override RSS | `cbc-radio-cli <URL> --rss-url <RSS>` |
+| Custom output dir | `cbc-radio-cli <URL> --output-dir ./downloads` |
+| Tag MP3 | `cbc-radio-cli <URL> --tag` |
+| Transcribe | `cbc-radio-cli <URL> --transcribe` |
+| Transcribe to dir | `cbc-radio-cli <URL> --transcribe --transcribe-dir ./transcripts` |
+| Whisper model | `cbc-radio-cli <URL> --transcribe --transcribe-model small` |
+| Transcribe first 30s | `cbc-radio-cli <URL> --transcribe --transcribe-duration 30` |
+| Transcribe range | `cbc-radio-cli <URL> --transcribe --transcribe-start 25:31 --transcribe-end 35:00` |
+| Debug archive | `cbc-radio-cli <URL> --debug` |
+| Browse a section | `cbc-radio-cli https://www.cbc.ca/radio/ --interactive` |
+| Browse stories (force story list) | `cbc-radio-cli https://www.cbc.ca/radio/ --browse-stories --interactive` |
+| List section feed | `cbc-radio-cli https://www.cbc.ca/radio/ --list 10` |
+| List stories | `cbc-radio-cli https://www.cbc.ca/radio/ --story-list 10` |
+| List shows | `cbc-radio-cli https://www.cbc.ca/radio/ --show-list 10` |
+| Action prompt | `cbc-radio-cli https://www.cbc.ca/radio/ --interactive` |
 
 ## Sample usage (all commands)
 
 Basic download
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073
 ```
 
 Browse a section (RSS feed when available)
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ --interactive
+cbc-radio-cli https://www.cbc.ca/radio/ --interactive
 ```
 
 Browse stories (force story list)
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ --browse-stories --interactive
+cbc-radio-cli https://www.cbc.ca/radio/ --browse-stories --interactive
 ```
 
 Resolve URL only
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --dry-run
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --dry-run
 ```
 
 Print URL only (same as dry-run, explicit)
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --print-url
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --print-url
 ```
 
 JSON output
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --print-url --json
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --print-url --json
 ```
 
 List top matches
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --list 5
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --list 5
 ```
 
 Non-interactive summary
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --summary 5
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --summary 5
 ```
 
 Interactive selection
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --interactive
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --interactive
 ```
 
 Force non-interactive
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --non-interactive
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --non-interactive
 ```
 
 Override show slug
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --show ideas
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --show ideas
 ```
 
 Use provider preset
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --provider ideas
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --provider ideas
 ```
 
 Override RSS URL
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --rss-url https://www.cbc.ca/podcasting/includes/ideas.xml
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --rss-url https://www.cbc.ca/podcasting/includes/ideas.xml
 ```
 
 Discover RSS only
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --rss-discover-only
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --rss-discover-only
 ```
 
 Story list (from section URL)
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ --story-list 10
+cbc-radio-cli https://www.cbc.ca/radio/ --story-list 10
 ```
 
 Section feed list (from section URL)
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ --list 10
+cbc-radio-cli https://www.cbc.ca/radio/ --list 10
 ```
 
 Show list (from section URL)
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ --show-list 10
+cbc-radio-cli https://www.cbc.ca/radio/ --show-list 10
 ```
 
 Override title for matching
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --title "PT 1 | Injustice For All"
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --title "PT 1 | Injustice For All"
 ```
 
 No download (resolve only)
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --no-download
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --no-download
 ```
 
 Output directory
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --output-dir ./downloads
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --output-dir ./downloads
 ```
 
 Output template
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --output "%(uploader)s/%(upload_date)s - %(title)s.%(ext)s"
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --output "%(uploader)s/%(upload_date)s - %(title)s.%(ext)s"
 ```
 
 Audio format
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --audio-format mp3
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --audio-format mp3
 ```
 
 yt-dlp format selector
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --format "bestaudio"
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --format "bestaudio"
 ```
 
 Cache TTL
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --cache-ttl 7200
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --cache-ttl 7200
 ```
 
 Repair mode (bypass cache + re-resolve)
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --repair
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --repair
 ```
 
 Tag MP3 (requires mutagen)
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --tag
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --tag
 ```
 
 Disable tagging explicitly
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --tag --no-tag
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --tag --no-tag
 ```
 
 Transcribe (requires whisper CLI)
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --transcribe
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --transcribe
 ```
 
 Transcribe to a directory
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --transcribe --transcribe-dir ./transcripts
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --transcribe --transcribe-dir ./transcripts
 ```
 
 Transcribe first 30 seconds
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --transcribe --transcribe-duration 30
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --transcribe --transcribe-duration 30
 ```
 
 Transcribe a time range
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --transcribe --transcribe-start 25:31 --transcribe-end 35:00
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --transcribe --transcribe-start 25:31 --transcribe-end 35:00
 ```
 
 Debug archive (auto dir)
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --debug
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --debug
 ```
 
 Debug archive (custom dir)
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --debug-dir ./debug_run
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --debug-dir ./debug_run
 ```
 
 Record fixtures
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --record ./fixtures
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --record ./fixtures
 ```
 
 Verbose logs
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --verbose
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --verbose
 ```
 
 Shell completion
 ```bash
-./cbc_ideas_audio_dl.py https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --completion zsh
+cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairness-justice-1.6836073 --completion zsh
 ```
 
 ## Tests

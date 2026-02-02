@@ -51,7 +51,7 @@ Homebrew tap repo: https://github.com/joshuascottpaul/homebrew-cbc-radio-cli
 - [Homebrew release flow (maintainers)](#homebrew-release-flow-maintainers)
 
 ## Requirements
-- Python 3.11+
+- Python 3.11+ (checks at startup and prints a friendly error if older)
 - `yt-dlp` in your PATH
 - Internet access
 

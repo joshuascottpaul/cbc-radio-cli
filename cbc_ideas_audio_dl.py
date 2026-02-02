@@ -613,6 +613,16 @@ def ensure_yt_dlp() -> bool:
     return bool(shutil.which("yt-dlp"))
 
 
+def ensure_python_version(min_major: int = 3, min_minor: int = 11) -> bool:
+    if sys.version_info < (min_major, min_minor):
+        print(
+            f"Error: Python {min_major}.{min_minor}+ is required. You are running {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}.",
+            file=sys.stderr,
+        )
+        return False
+    return True
+
+
 def completion_script(shell: str) -> str:
     if shell == "bash":
         return """_cbc_audio_complete() {
@@ -1142,6 +1152,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def run(args: argparse.Namespace) -> int:
+    if not ensure_python_version():
+        return 2
     if args.version:
         print(__version__)
         return 0

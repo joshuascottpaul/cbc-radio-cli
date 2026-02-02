@@ -53,6 +53,18 @@ class TestCbcIdeasDl(unittest.TestCase):
         reqs = req_path.read_text(encoding="utf-8")
         self.assertIn("python-multipart", reqs)
 
+    def test_python_version_check(self):
+        class DummyVer:
+            major = 3
+            minor = 10
+            micro = 9
+
+            def __lt__(self, other):
+                return (self.major, self.minor) < other
+
+        with mock.patch.object(cbc.sys, "version_info", DummyVer()):
+            self.assertFalse(cbc.ensure_python_version())
+
     def test_web_grouping_contains_basic(self):
         import sys
         import types

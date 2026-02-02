@@ -13,7 +13,17 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
+def _ensure_python_version(min_major: int = 3, min_minor: int = 11) -> None:
+    import sys
+
+    if sys.version_info < (min_major, min_minor):
+        raise RuntimeError(
+            f"Python {min_major}.{min_minor}+ is required. You are running {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}."
+        )
+
+
 try:
+    _ensure_python_version()
     from cbc_ideas_audio_dl import build_parser, run
 except ModuleNotFoundError:
     script_dir = Path(__file__).resolve().parent

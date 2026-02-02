@@ -40,7 +40,23 @@ except ModuleNotFoundError:
     build_parser = module.build_parser
     run = module.run
 
-TEMPLATES = Jinja2Templates(directory="web/templates")
+_SCRIPT_DIR = Path(__file__).resolve().parent
+_TEMPLATE_CANDIDATES = [
+    _SCRIPT_DIR / "web" / "templates",
+    _SCRIPT_DIR / "templates",
+    _SCRIPT_DIR / ".." / "share" / "cbc-radio-cli" / "templates",
+    Path("/opt/homebrew/share/cbc-radio-cli/templates"),
+    Path("/usr/local/share/cbc-radio-cli/templates"),
+]
+_template_dir = None
+for path in _TEMPLATE_CANDIDATES:
+    if path.exists():
+        _template_dir = path
+        break
+if _template_dir is None:
+    raise RuntimeError("Template directory not found. Reinstall cbc-radio-cli.")
+
+TEMPLATES = Jinja2Templates(directory=str(_template_dir))
 
 
 @dataclass

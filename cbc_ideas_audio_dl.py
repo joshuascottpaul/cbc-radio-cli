@@ -37,7 +37,7 @@ USER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36"
 )
-__version__ = "0.1.6"
+__version__ = "0.1.7"
 DEFAULT_SHOW = "ideas"
 
 PROVIDERS = {
@@ -1182,7 +1182,15 @@ def run(args: argparse.Namespace) -> int:
             hint_lines.append(f"  {fallback}")
             print("\n".join(hint_lines), file=sys.stderr)
             return 2
-        from cbc_radio_web import run_web
+        try:
+            from cbc_radio_web import run_web
+        except ModuleNotFoundError:
+            print(
+                "Web UI module not found. If installed via Homebrew, upgrade to the latest version:\n"
+                "  brew upgrade cbc-radio-cli",
+                file=sys.stderr,
+            )
+            return 2
 
         run_web(host=args.web_host, port=args.web_port)
         return 0

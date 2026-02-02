@@ -542,6 +542,18 @@ class TestCliFlags(unittest.TestCase):
         self.assertIn("requirements-web.txt", err)
         self.assertIn("venv", err.lower())
 
+    def test_web_missing_module_error(self):
+        def fake_import(name):
+            return object()
+
+        with mock.patch("importlib.import_module", side_effect=fake_import):
+            rc, _out, err = self.run_main(
+                ["cbc_ideas_audio_dl.py", "--web"],
+                {"https://example.com/story-1.123": (FIXTURE_DIR / "story.html").read_text(encoding="utf-8")},
+            )
+        self.assertEqual(rc, 2)
+        self.assertIn("web ui module not found", err.lower())
+
     def test_transcribe_failure_is_error(self):
         story = (FIXTURE_DIR / "story.html").read_text(encoding="utf-8")
         feed = (FIXTURE_DIR / "feed.xml").read_text(encoding="utf-8")

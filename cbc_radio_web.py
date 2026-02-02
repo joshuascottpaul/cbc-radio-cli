@@ -28,9 +28,11 @@ except ModuleNotFoundError:
             break
     if candidate is None:
         raise
+    import importlib.machinery
     import importlib.util
 
-    spec = importlib.util.spec_from_file_location("cbc_ideas_audio_dl", candidate)
+    loader = importlib.machinery.SourceFileLoader("cbc_ideas_audio_dl", str(candidate))
+    spec = importlib.util.spec_from_loader("cbc_ideas_audio_dl", loader)
     if not spec or not spec.loader:
         raise
     module = importlib.util.module_from_spec(spec)

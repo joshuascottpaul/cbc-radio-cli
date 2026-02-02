@@ -53,6 +53,44 @@ class TestCbcIdeasDl(unittest.TestCase):
         reqs = req_path.read_text(encoding="utf-8")
         self.assertIn("python-multipart", reqs)
 
+    def test_web_grouping_contains_basic(self):
+        import sys
+        import types
+
+        class DummyApp:
+            def __init__(self, *args, **kwargs):
+                pass
+
+            def get(self, *args, **kwargs):
+                def decorator(fn):
+                    return fn
+                return decorator
+
+            def post(self, *args, **kwargs):
+                def decorator(fn):
+                    return fn
+                return decorator
+
+        fastapi = types.SimpleNamespace(FastAPI=DummyApp, Request=object)
+        responses = types.SimpleNamespace(JSONResponse=object, RedirectResponse=object)
+        templating = types.SimpleNamespace(Jinja2Templates=lambda **kwargs: object())
+        sys.modules["fastapi"] = fastapi
+        sys.modules["fastapi.responses"] = responses
+        sys.modules["fastapi.templating"] = templating
+        spec = importlib.util.spec_from_file_location(
+            "cbc_radio_web",
+            Path(__file__).resolve().parents[1] / "cbc_radio_web.py",
+        )
+        module = importlib.util.module_from_spec(spec)
+        assert spec and spec.loader
+        spec.loader.exec_module(module)
+        fields = module._parser_fields()
+        grouped = module._group_fields(fields)
+        self.assertIn("basic", grouped)
+        self.assertTrue(grouped["basic"])
+        for key in ("fastapi", "fastapi.responses", "fastapi.templating"):
+            sys.modules.pop(key, None)
+
 
 class TestCliFlags(unittest.TestCase):
     def run_main(self, argv, fetch_map, input_values=None, force_story=False):

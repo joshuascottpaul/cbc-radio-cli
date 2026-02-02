@@ -74,6 +74,49 @@ _jobs: dict[str, Job] = {}
 _jobs_lock = threading.Lock()
 
 
+_LABELS = {
+    "dry_run": "Resolve only (no download)",
+    "print_url": "Print resolved URL",
+    "list": "List top matches",
+    "summary": "Summary (non-interactive)",
+    "browse_stories": "Browse stories from section URL",
+    "story_list": "List stories",
+    "show_list": "List shows",
+    "show": "Show slug override",
+    "rss_url": "RSS override URL",
+    "provider": "Provider preset",
+    "title": "Title override for matching",
+    "no_download": "Resolve only, do not download",
+    "output": "Output template",
+    "output_dir": "Output directory",
+    "audio_format": "Audio format",
+    "ytdlp_format": "yt-dlp format selector",
+    "tag": "Tag with ID3 metadata",
+    "no_tag": "Disable tagging",
+    "transcribe": "Transcribe with whisper",
+    "transcribe_dir": "Transcription output directory",
+    "transcribe_model": "Whisper model",
+    "transcribe_start": "Transcribe start time",
+    "transcribe_end": "Transcribe end time",
+    "transcribe_duration": "Transcribe duration",
+    "debug": "Write debug archive",
+    "debug_dir": "Debug archive directory",
+    "record": "Record fixtures",
+    "repair": "Repair (re-resolve on failure)",
+    "cache_ttl": "Cache TTL seconds",
+    "interactive": "Interactive selection",
+    "non_interactive": "Force non-interactive",
+}
+
+_GROUPS = {
+    "basic": {"url", "dry_run", "print_url", "list", "summary", "browse_stories", "story_list", "show_list"},
+    "match": {"show", "rss_url", "provider", "title"},
+    "output": {"output", "output_dir", "audio_format", "ytdlp_format"},
+    "transcribe": {"transcribe", "transcribe_dir", "transcribe_model", "transcribe_start", "transcribe_end", "transcribe_duration"},
+    "advanced": {"tag", "no_tag", "debug", "debug_dir", "record", "repair", "cache_ttl", "interactive", "non_interactive"},
+}
+
+
 def _parser_fields() -> list[dict[str, Any]]:
     parser = build_parser()
     fields: list[dict[str, Any]] = []
@@ -97,11 +140,12 @@ def _parser_fields() -> list[dict[str, Any]]:
         else:
             kind = "text"
         placeholder = action.metavar or ""
+        label = _LABELS.get(name, option)
         fields.append(
             {
                 "name": name,
                 "option": option,
-                "label": option,
+                "label": label,
                 "help": help_text,
                 "kind": kind,
                 "choices": list(action.choices) if action.choices else [],
@@ -110,6 +154,20 @@ def _parser_fields() -> list[dict[str, Any]]:
             }
         )
     return fields
+
+
+def _group_fields(fields: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
+    grouped: dict[str, list[dict[str, Any]]] = {k: [] for k in _GROUPS}
+    for field in fields:
+        group_name = None
+        for group, names in _GROUPS.items():
+            if field["name"] in names:
+                group_name = group
+                break
+        if not group_name:
+            group_name = "advanced"
+        grouped[group_name].append(field)
+    return grouped
 
 
 def _run_job(job_id: str, argv: list[str]) -> None:
@@ -139,9 +197,10 @@ def _run_job(job_id: str, argv: list[str]) -> None:
 
 @app.get("/")
 def index(request: Request):
+    fields = _parser_fields()
     return TEMPLATES.TemplateResponse(
         "index.html",
-        {"request": request, "fields": _parser_fields()},
+        {"request": request, "groups": _group_fields(fields), "fields": fields},
     )
 
 

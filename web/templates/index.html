@@ -26,6 +26,7 @@
             placeholder="https://www.cbc.ca/radio/ideas/..."
             class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
+          <p class="text-xs text-slate-500 mt-2">Paste a CBC story or section URL and click Run.</p>
         </section>
 
         <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
@@ -34,50 +35,78 @@
             <span class="text-sm text-slate-500">All CLI flags are available</span>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {% for field in fields %}
-              <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">
-                  {{ field.label }}
-                </label>
-                {% if field.kind == "checkbox" %}
-                  <label class="inline-flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      name="{{ field.name }}"
-                      value="1"
-                      class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
-                    />
-                    <span class="text-sm text-slate-600">{{ field.help }}</span>
-                  </label>
-                {% elif field.kind == "select" %}
-                  <select
-                    name="{{ field.name }}"
-                    class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  >
-                    <option value="">(default)</option>
-                    {% for choice in field.choices %}
-                      <option value="{{ choice }}">{{ choice }}</option>
-                    {% endfor %}
-                  </select>
-                  {% if field.help %}
-                    <p class="text-xs text-slate-500 mt-1">{{ field.help }}</p>
-                  {% endif %}
-                {% else %}
-                  <input
-                    type="{{ field.kind }}"
-                    name="{{ field.name }}"
-                    placeholder="{{ field.placeholder }}"
-                    class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                  {% if field.help %}
-                    <p class="text-xs text-slate-500 mt-1">{{ field.help }}</p>
-                  {% endif %}
-                {% endif %}
-              </div>
+          <div class="flex flex-wrap gap-2 mb-6">
+            <button type="button" class="preset bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded text-sm" data-preset="resolve">
+              Resolve only
+            </button>
+            <button type="button" class="preset bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded text-sm" data-preset="download">
+              Download (default)
+            </button>
+            <button type="button" class="preset bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded text-sm" data-preset="transcribe">
+              Download + transcribe
+            </button>
+            <button type="button" class="preset bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded text-sm" data-preset="browse">
+              Browse section
+            </button>
+          </div>
+
+          <div class="space-y-6">
+            {% for group_name, group_fields in groups.items() %}
+              <details class="rounded-lg border border-slate-200 p-4" {% if group_name == "basic" %}open{% endif %}>
+                <summary class="cursor-pointer font-medium text-slate-800 capitalize">{{ group_name }}</summary>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                  {% for field in group_fields %}
+                    <div>
+                      <label class="block text-sm font-medium text-slate-700 mb-1">
+                        {{ field.label }}
+                        <span class="ml-2 text-xs text-slate-400 font-mono">{{ field.option }}</span>
+                      </label>
+                      {% if field.kind == "checkbox" %}
+                        <label class="inline-flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            name="{{ field.name }}"
+                            value="1"
+                            class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                          />
+                          <span class="text-sm text-slate-600">{{ field.help }}</span>
+                        </label>
+                      {% elif field.kind == "select" %}
+                        <select
+                          name="{{ field.name }}"
+                          class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        >
+                          <option value="">(default)</option>
+                          {% for choice in field.choices %}
+                            <option value="{{ choice }}">{{ choice }}</option>
+                          {% endfor %}
+                        </select>
+                        {% if field.help %}
+                          <p class="text-xs text-slate-500 mt-1">{{ field.help }}</p>
+                        {% endif %}
+                      {% else %}
+                        <input
+                          type="{{ field.kind }}"
+                          name="{{ field.name }}"
+                          placeholder="{{ field.placeholder }}"
+                          class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                        {% if field.help %}
+                          <p class="text-xs text-slate-500 mt-1">{{ field.help }}</p>
+                        {% endif %}
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
+              </details>
             {% endfor %}
           </div>
         </section>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+          <div class="text-xs text-slate-500 mb-2">CLI preview</div>
+          <pre id="cli-preview" class="text-xs text-slate-800 whitespace-pre-wrap font-mono"></pre>
+        </div>
 
         <div class="flex items-center gap-3">
           <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-indigo-700">
@@ -87,5 +116,52 @@
         </div>
       </form>
     </div>
+
+    <script>
+      const form = document.querySelector("form");
+      const preview = document.getElementById("cli-preview");
+      const presets = {
+        resolve: { dry_run: true },
+        download: { dry_run: false, transcribe: false },
+        transcribe: { transcribe: true },
+        browse: { browse_stories: true, interactive: false },
+      };
+
+      function updatePreview() {
+        const data = new FormData(form);
+        const args = ["cbc-radio-cli"];
+        const url = data.get("url");
+        if (url) args.push(url);
+        for (const [key, value] of data.entries()) {
+          if (key === "url") continue;
+          if (value === "1") {
+            args.push(`--${key.replace(/_/g, "-")}`);
+          } else if (value) {
+            args.push(`--${key.replace(/_/g, "-")}`, value);
+          }
+        }
+        preview.textContent = args.join(" ");
+      }
+
+      form.addEventListener("input", updatePreview);
+      updatePreview();
+
+      document.querySelectorAll(".preset").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const preset = presets[btn.dataset.preset];
+          if (!preset) return;
+          for (const [name, value] of Object.entries(preset)) {
+            const input = form.querySelector(`[name="${name}"]`);
+            if (!input) continue;
+            if (input.type === "checkbox") {
+              input.checked = Boolean(value);
+            } else {
+              input.value = value ? String(value) : "";
+            }
+          }
+          updatePreview();
+        });
+      });
+    </script>
   </body>
 </html>

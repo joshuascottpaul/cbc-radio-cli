@@ -17,8 +17,16 @@ try:
     from cbc_ideas_audio_dl import build_parser, run
 except ModuleNotFoundError:
     script_dir = Path(__file__).resolve().parent
-    candidate = script_dir / "cbc_ideas_audio_dl.py"
-    if not candidate.exists():
+    candidates = [
+        script_dir / "cbc_ideas_audio_dl.py",
+        script_dir / "cbc-radio-cli",
+    ]
+    candidate = None
+    for path in candidates:
+        if path.exists():
+            candidate = path
+            break
+    if candidate is None:
         raise
     import importlib.util
 

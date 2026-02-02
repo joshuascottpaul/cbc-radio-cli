@@ -37,7 +37,7 @@ USER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36"
 )
-__version__ = "0.1.13"
+__version__ = "0.1.14"
 DEFAULT_SHOW = "ideas"
 
 PROVIDERS = {
@@ -1152,6 +1152,7 @@ def run(args: argparse.Namespace) -> int:
             importlib.import_module("fastapi")
             importlib.import_module("uvicorn")
             importlib.import_module("jinja2")
+            importlib.import_module("multipart")
         except Exception:
             fallback = "python3 -m pip install --user -r https://raw.githubusercontent.com/joshuascottpaul/cbc-radio-cli/main/requirements-web.txt"
             local_hint = None

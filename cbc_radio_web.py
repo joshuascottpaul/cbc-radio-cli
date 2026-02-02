@@ -6,13 +6,29 @@ import threading
 import time
 import uuid
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from cbc_ideas_audio_dl import build_parser, run
+try:
+    from cbc_ideas_audio_dl import build_parser, run
+except ModuleNotFoundError:
+    script_dir = Path(__file__).resolve().parent
+    candidate = script_dir / "cbc_ideas_audio_dl.py"
+    if not candidate.exists():
+        raise
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("cbc_ideas_audio_dl", candidate)
+    if not spec or not spec.loader:
+        raise
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    build_parser = module.build_parser
+    run = module.run
 
 TEMPLATES = Jinja2Templates(directory="web/templates")
 

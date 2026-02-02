@@ -50,6 +50,9 @@ except ModuleNotFoundError:
     if not spec or not spec.loader:
         raise
     module = importlib.util.module_from_spec(spec)
+    import sys
+
+    sys.modules["cbc_ideas_audio_dl"] = module
     spec.loader.exec_module(module)
     build_parser = module.build_parser
     run = module.run

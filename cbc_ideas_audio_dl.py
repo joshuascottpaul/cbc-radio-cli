@@ -1185,12 +1185,24 @@ def run(args: argparse.Namespace) -> int:
         try:
             from cbc_radio_web import run_web
         except ModuleNotFoundError:
-            print(
-                "Web UI module not found. If installed via Homebrew, upgrade to the latest version:\n"
-                "  brew upgrade cbc-radio-cli",
-                file=sys.stderr,
-            )
-            return 2
+            run_web = None
+            script_path = Path(__file__).resolve()
+            candidate = script_path.parent / "cbc_radio_web.py"
+            if candidate.exists():
+                import importlib.util
+
+                spec = importlib.util.spec_from_file_location("cbc_radio_web", candidate)
+                if spec and spec.loader:
+                    module = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(module)
+                    run_web = getattr(module, "run_web", None)
+            if not run_web:
+                print(
+                    "Web UI module not found. If installed via Homebrew, upgrade to the latest version:\n"
+                    "  brew upgrade cbc-radio-cli",
+                    file=sys.stderr,
+                )
+                return 2
 
         run_web(host=args.web_host, port=args.web_port)
         return 0

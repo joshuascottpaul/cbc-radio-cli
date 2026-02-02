@@ -546,7 +546,8 @@ class TestCliFlags(unittest.TestCase):
         def fake_import(name):
             return object()
 
-        with mock.patch("importlib.import_module", side_effect=fake_import):
+        with mock.patch("importlib.import_module", side_effect=fake_import), \
+             mock.patch.object(cbc.Path, "exists", return_value=False):
             rc, _out, err = self.run_main(
                 ["cbc_ideas_audio_dl.py", "--web"],
                 {"https://example.com/story-1.123": (FIXTURE_DIR / "story.html").read_text(encoding="utf-8")},

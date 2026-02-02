@@ -330,6 +330,8 @@ def job_status(job_id: str):
                 "status": job.status,
                 "exit_code": job.exit_code,
                 "output": job.output,
+                "started_at": job.started_at,
+                "argv": job.argv,
             }
         )
 

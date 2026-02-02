@@ -5,16 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Run {{ job_id }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+      }
+    </style>
   </head>
   <body class="bg-slate-50 text-slate-900">
     <div class="max-w-4xl mx-auto px-6 py-10">
       <header class="mb-6">
         <h1 class="text-2xl font-semibold">Run {{ job_id }}</h1>
-        <p class="text-slate-600 mt-1">Status: <span id="status">starting...</span></p>
+        <div class="mt-2 flex flex-wrap items-center gap-3 text-sm">
+          <span id="status-pill" class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-slate-700">
+            <span id="status-dot" class="inline-block h-2 w-2 rounded-full bg-slate-400"></span>
+            <span id="status">starting...</span>
+          </span>
+          <span class="text-slate-500">Elapsed: <span id="elapsed">0s</span></span>
+        </div>
       </header>
 
+      <div class="mb-6 bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+        <div class="mb-2 text-xs text-slate-500">Command</div>
+        <div class="flex items-center gap-3">
+          <pre id="argv" class="flex-1 text-xs text-slate-800 whitespace-pre-wrap font-mono"></pre>
+          <button id="copy-argv" class="text-xs text-indigo-600 hover:underline">Copy</button>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <div class="mb-2 flex items-center justify-between text-sm text-slate-600">
+          <span>Progress</span>
+          <span id="progress-label">Waiting...</span>
+        </div>
+        <div class="relative h-3 rounded-full bg-slate-200 overflow-hidden">
+          <div id="progress-bar" class="absolute inset-0 bg-slate-200">
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-400/70 to-transparent opacity-70 animate-[shimmer_1.6s_linear_infinite]"></div>
+          </div>
+          <div id="progress-done" class="absolute inset-0 h-full w-0 bg-emerald-500"></div>
+        </div>
+      </div>
+
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-        <pre id="output" class="whitespace-pre-wrap text-sm text-slate-800"></pre>
+        <div class="mb-3 flex items-center justify-between">
+          <div class="text-xs text-slate-500">Live output</div>
+          <label class="text-xs text-slate-500 inline-flex items-center gap-2">
+            <input id="auto-scroll" type="checkbox" class="rounded border-slate-300 text-indigo-600" checked />
+            Auto-scroll
+          </label>
+        </div>
+        <pre id="output" class="whitespace-pre-wrap text-sm text-slate-800 max-h-96 overflow-auto"></pre>
       </div>
 
       <div class="mt-4 flex gap-3">
@@ -24,12 +64,74 @@
     </div>
 
     <script>
+      const statusEl = document.getElementById("status");
+      const statusPill = document.getElementById("status-pill");
+      const statusDot = document.getElementById("status-dot");
+      const outputEl = document.getElementById("output");
+      const argvEl = document.getElementById("argv");
+      const elapsedEl = document.getElementById("elapsed");
+      const progressLabel = document.getElementById("progress-label");
+      const progressBar = document.getElementById("progress-bar");
+      const progressDone = document.getElementById("progress-done");
+      const autoScroll = document.getElementById("auto-scroll");
+      const copyBtn = document.getElementById("copy-argv");
+      let startedAt = null;
+
+      function formatElapsed(seconds) {
+        if (seconds < 60) return `${seconds}s`;
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m}m ${s}s`;
+      }
+
+      function updateStatus(status, exitCode) {
+        statusEl.textContent = status;
+        if (status === "running") {
+          statusPill.className = "inline-flex items-center gap-2 rounded-full bg-indigo-100 px-3 py-1 text-indigo-700";
+          statusDot.className = "inline-block h-2 w-2 rounded-full bg-indigo-500 animate-pulse";
+          progressLabel.textContent = "Running...";
+          progressBar.style.display = "block";
+          progressDone.style.display = "none";
+        } else {
+          const ok = exitCode === 0;
+          statusPill.className = `inline-flex items-center gap-2 rounded-full px-3 py-1 ${ok ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`;
+          statusDot.className = `inline-block h-2 w-2 rounded-full ${ok ? "bg-emerald-500" : "bg-red-500"}`;
+          progressLabel.textContent = ok ? "Done" : "Error";
+          progressBar.style.display = "none";
+          progressDone.style.display = "block";
+          progressDone.style.width = "100%";
+          progressDone.className = `h-full ${ok ? "bg-emerald-500" : "bg-red-500"}`;
+        }
+      }
+
+      function maybeScroll() {
+        if (!autoScroll.checked) return;
+        outputEl.scrollTop = outputEl.scrollHeight;
+      }
+
+      copyBtn.addEventListener("click", () => {
+        const text = argvEl.textContent || "";
+        if (!text) return;
+        navigator.clipboard.writeText(text);
+      });
+
       async function poll() {
         const res = await fetch("/status/{{ job_id }}");
         if (!res.ok) return;
         const data = await res.json();
-        document.getElementById("status").textContent = data.status;
-        document.getElementById("output").textContent = data.output || "";
+        updateStatus(data.status, data.exit_code);
+        outputEl.textContent = data.output || "";
+        if (data.argv && data.argv.length) {
+          argvEl.textContent = ["cbc-radio-cli", ...data.argv].join(" ");
+        }
+        if (startedAt === null && data.started_at) {
+          startedAt = data.started_at;
+        }
+        if (startedAt) {
+          const elapsed = Math.max(0, Math.floor(Date.now() / 1000 - startedAt));
+          elapsedEl.textContent = formatElapsed(elapsed);
+        }
+        maybeScroll();
         if (data.status !== "running") return;
         setTimeout(poll, 1000);
       }

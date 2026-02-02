@@ -48,6 +48,11 @@ class TestCbcIdeasDl(unittest.TestCase):
         payload = json.dumps([item.__dict__ for item in items])
         self.assertTrue(payload.startswith("["))
 
+    def test_requirements_web_includes_multipart(self):
+        req_path = Path(__file__).resolve().parents[1] / "requirements-web.txt"
+        reqs = req_path.read_text(encoding="utf-8")
+        self.assertIn("python-multipart", reqs)
+
 
 class TestCliFlags(unittest.TestCase):
     def run_main(self, argv, fetch_map, input_values=None, force_story=False):

@@ -540,6 +540,7 @@ class TestCliFlags(unittest.TestCase):
             )
         self.assertEqual(rc, 2)
         self.assertIn("requirements-web.txt", err)
+        self.assertIn("venv", err.lower())
 
     def test_transcribe_failure_is_error(self):
         story = (FIXTURE_DIR / "story.html").read_text(encoding="utf-8")

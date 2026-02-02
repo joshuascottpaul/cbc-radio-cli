@@ -111,6 +111,14 @@ Notes:
 - You can set `--web-host` and `--web-port` if needed.
 - If web deps are missing, the CLI will print a one‑liner install command.
 
+Venv setup (recommended on Homebrew Python):
+```bash
+python3 -m venv ~/.venvs/cbc-radio-cli
+source ~/.venvs/cbc-radio-cli/bin/activate
+python3 -m pip install -r /opt/homebrew/share/cbc-radio-cli/requirements-web.txt
+cbc-radio-cli --web
+```
+
 ## Usage (full)
 
 Basic download:

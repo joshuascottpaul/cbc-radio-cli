@@ -1169,7 +1169,12 @@ def run(args: argparse.Namespace) -> int:
                         break
             hint_lines = [
                 "Web UI dependencies missing.",
-                "Install with:",
+                "Recommended setup (venv):",
+                "  python3 -m venv ~/.venvs/cbc-radio-cli",
+                "  source ~/.venvs/cbc-radio-cli/bin/activate",
+                "  python3 -m pip install -r /opt/homebrew/share/cbc-radio-cli/requirements-web.txt",
+                "",
+                "Or install directly with:",
             ]
             if local_hint:
                 hint_lines.append(f"  {local_hint}")

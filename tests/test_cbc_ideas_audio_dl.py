@@ -6,12 +6,14 @@ import tempfile
 import unittest
 from unittest import mock
 from contextlib import ExitStack
+import sys
 
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "cbc_ideas_audio_dl.py"
 FIXTURE_DIR = Path(__file__).resolve().parent / "fixtures"
 
 spec = importlib.util.spec_from_file_location("cbc_ideas_audio_dl", SCRIPT_PATH)
 cbc = importlib.util.module_from_spec(spec)
+sys.modules["cbc_ideas_audio_dl"] = cbc
 spec.loader.exec_module(cbc)
 
 
@@ -47,6 +49,12 @@ class TestCbcIdeasDl(unittest.TestCase):
         items = cbc.collect_feed_items(feed, audio.get("title"), audio.get("description"), target_ts)
         payload = json.dumps([item.__dict__ for item in items])
         self.assertTrue(payload.startswith("["))
+
+    def test_is_story_url_variants(self):
+        self.assertTrue(cbc.is_story_url("https://www.cbc.ca/radio/ideas/example-story-1.2345"))
+        self.assertTrue(cbc.is_story_url("https://www.cbc.ca/radio/ideas/example-story-9.7052937"))
+        self.assertTrue(cbc.is_story_url("https://www.cbc.ca/radio/ideas/example-story-9.7052937?cmp=rss"))
+        self.assertFalse(cbc.is_story_url("https://www.cbc.ca/radio/ideas/"))
 
     def test_requirements_web_includes_multipart(self):
         req_path = Path(__file__).resolve().parents[1] / "requirements-web.txt"
@@ -94,13 +102,68 @@ class TestCbcIdeasDl(unittest.TestCase):
             Path(__file__).resolve().parents[1] / "cbc_radio_web.py",
         )
         module = importlib.util.module_from_spec(spec)
+        sys.modules["cbc_radio_web"] = module
         assert spec and spec.loader
         spec.loader.exec_module(module)
         fields = module._parser_fields()
         grouped = module._group_fields(fields)
         self.assertIn("basic", grouped)
         self.assertTrue(grouped["basic"])
-        for key in ("fastapi", "fastapi.responses", "fastapi.templating"):
+        for key in ("fastapi", "fastapi.responses", "fastapi.templating", "cbc_radio_web"):
+            sys.modules.pop(key, None)
+
+    def test_web_validate_section_requires_list(self):
+        import sys
+        import types
+
+        class DummyApp:
+            def __init__(self, *args, **kwargs):
+                pass
+
+            def get(self, *args, **kwargs):
+                def decorator(fn):
+                    return fn
+                return decorator
+
+            def post(self, *args, **kwargs):
+                def decorator(fn):
+                    return fn
+                return decorator
+
+        fastapi = types.SimpleNamespace(FastAPI=DummyApp, Request=object)
+        responses = types.SimpleNamespace(JSONResponse=object, RedirectResponse=object)
+        templating = types.SimpleNamespace(Jinja2Templates=lambda **kwargs: object())
+        sys.modules["fastapi"] = fastapi
+        sys.modules["fastapi.responses"] = responses
+        sys.modules["fastapi.templating"] = templating
+        spec = importlib.util.spec_from_file_location(
+            "cbc_radio_web",
+            Path(__file__).resolve().parents[1] / "cbc_radio_web.py",
+        )
+        module = importlib.util.module_from_spec(spec)
+        sys.modules["cbc_radio_web"] = module
+        assert spec and spec.loader
+        spec.loader.exec_module(module)
+
+        error = module._validate_request("https://www.cbc.ca/radio/", {})
+        self.assertIn("Section URLs", error)
+        error = module._validate_request(
+            "https://www.cbc.ca/radio/",
+            {"story_list": "5"},
+        )
+        self.assertIsNone(error)
+        error = module._validate_request(
+            "https://www.cbc.ca/radio/",
+            {"browse_stories": "1"},
+        )
+        self.assertIn("Browse stories", error)
+        error = module._validate_request(
+            "https://www.cbc.ca/radio/ideas/some-story-1.12345",
+            {},
+        )
+        self.assertIsNone(error)
+
+        for key in ("fastapi", "fastapi.responses", "fastapi.templating", "cbc_radio_web"):
             sys.modules.pop(key, None)
 
 

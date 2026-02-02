@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 import argparse
 import contextlib
 import io
@@ -17,14 +18,17 @@ def _ensure_python_version(min_major: int = 3, min_minor: int = 11) -> None:
     import sys
 
     if sys.version_info < (min_major, min_minor):
-        raise RuntimeError(
-            f"Python {min_major}.{min_minor}+ is required. You are running {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}."
+        print(
+            f"Error: Python {min_major}.{min_minor}+ is required. You are running {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}.",
+            file=sys.stderr,
         )
+        raise SystemExit(2)
 
 
 try:
     _ensure_python_version()
     from cbc_ideas_audio_dl import build_parser, run
+    from cbc_ideas_audio_dl import is_story_url
 except ModuleNotFoundError:
     script_dir = Path(__file__).resolve().parent
     candidates = [
@@ -49,6 +53,7 @@ except ModuleNotFoundError:
     spec.loader.exec_module(module)
     build_parser = module.build_parser
     run = module.run
+    is_story_url = module.is_story_url
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
 _TEMPLATE_CANDIDATES = [
@@ -214,12 +219,45 @@ def index(request: Request):
     )
 
 
+def _validate_request(url: str, form: dict) -> str | None:
+    if not url:
+        return "URL is required."
+    if form.get("browse_stories"):
+        return (
+            "Browse stories requires interactive selection, which the web UI does not support. "
+            "Use --story-list or --show-list instead."
+        )
+    # Web UI cannot prompt. If a section URL is provided, require a list option.
+    if not is_story_url(url):
+        needs_list = not any(
+            form.get(key)
+            for key in ("story_list", "show_list", "list", "summary")
+        )
+        if needs_list:
+            return (
+                "Section URLs need a non-interactive list option. "
+                "Use a story URL, or set --story-list/--show-list/--list/--summary."
+            )
+    return None
+
+
 @app.post("/run")
 async def run_job(request: Request):
     form = await request.form()
     url = (form.get("url") or "").strip()
-    if not url:
-        return JSONResponse({"error": "URL is required"}, status_code=400)
+    error = _validate_request(url, form)
+    if error:
+        fields = _parser_fields()
+        return TEMPLATES.TemplateResponse(
+            "index.html",
+            {
+                "request": request,
+                "groups": _group_fields(fields),
+                "fields": fields,
+                "error": error,
+            },
+            status_code=400,
+        )
 
     argv: list[str] = [url]
     for field in _parser_fields():
@@ -234,7 +272,17 @@ async def run_job(request: Request):
             argv.extend([option, value])
 
     if "--interactive" in argv:
-        return JSONResponse({"error": "Interactive mode is not supported in the web UI yet."}, status_code=400)
+        fields = _parser_fields()
+        return TEMPLATES.TemplateResponse(
+            "index.html",
+            {
+                "request": request,
+                "groups": _group_fields(fields),
+                "fields": fields,
+                "error": "Interactive mode is not supported in the web UI yet.",
+            },
+            status_code=400,
+        )
 
     if "--non-interactive" not in argv:
         argv.append("--non-interactive")

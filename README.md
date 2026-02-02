@@ -108,7 +108,7 @@ Then open: `http://127.0.0.1:8000`
 Notes:
 - The web UI runs locally and calls the same CLI logic.
 - Interactive mode isn’t supported yet in the web UI (use list/summary or non-interactive flags).
-- You can set `--web-host` and `--web-port` if needed.
+- You can set `--web-host` and `--web-port` if needed. For LAN access, use `--web-host 0.0.0.0` and open `http://<your-lan-ip>:8000` on another device (allow macOS firewall access if prompted).
 - If web deps are missing, the CLI will print a one‑liner install command.
 
 Venv setup (recommended on Homebrew Python):
@@ -207,9 +207,11 @@ cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairn
 - Runs locally; no data is sent anywhere unless you choose to.
 
 ## Troubleshooting
+- `Python 3.11+ is required`: upgrade your Python or install via Homebrew/pipx.
 - `ffmpeg not found`: install via `brew install ffmpeg`.
 - `whisper not found`: install `openai-whisper` (or use `requirements.txt`).
 - `No RSS found`: try `--rss-url` or `--title` to help matching.
+- Web UI not reachable from another device: start with `--web-host 0.0.0.0`, use your Mac’s LAN IP (e.g. `http://192.168.x.x:8000`), and allow macOS firewall access if prompted.
 
 ## Cheatsheet
 

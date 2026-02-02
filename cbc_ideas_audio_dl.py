@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 """
 High-level goals:
 - Given a CBC story URL, find the related audio episode.
@@ -37,7 +38,7 @@ USER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36"
 )
-__version__ = "0.1.16"
+__version__ = "0.1.18"
 DEFAULT_SHOW = "ideas"
 
 PROVIDERS = {
@@ -532,7 +533,7 @@ def resolve_feed_for_slug(slug: str, cache: Cache, ignore_cache: bool) -> tuple[
 
 
 def is_story_url(url: str) -> bool:
-    return bool(re.search(r"-1\.\d+(?:\?.*)?$", url))
+    return bool(re.search(r"-\d+\.\d+(?:\?.*)?$", url))
 
 
 def strip_tags(text: str) -> str:
@@ -542,7 +543,10 @@ def strip_tags(text: str) -> str:
 def discover_story_links(html: str) -> list[StoryItem]:
     items: list[StoryItem] = []
     seen: set[str] = set()
-    pattern = re.compile(r'<a[^>]+href=[\'"](/radio/[^\'"]+-1\.\d+[^\'"]*)[\'"][^>]*>(.*?)</a>', re.IGNORECASE | re.DOTALL)
+    pattern = re.compile(
+        r'<a[^>]+href=[\'"](/radio/[^\'"]+-\d+\.\d+[^\'"]*)[\'"][^>]*>(.*?)</a>',
+        re.IGNORECASE | re.DOTALL,
+    )
     for href, inner in pattern.findall(html):
         url = f"https://www.cbc.ca{href}"
         if url in seen:
@@ -1145,7 +1149,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--story-list", type=int, metavar="N", help="List top N discovered stories and exit")
     parser.add_argument("--show-list", type=int, metavar="N", help="List top N discovered shows and exit")
     parser.add_argument("--web", action="store_true", help="Launch local web UI")
-    parser.add_argument("--web-host", default="127.0.0.1", help="Web UI host (default: 127.0.0.1)")
+    parser.add_argument(
+        "--web-host",
+        default="127.0.0.1",
+        help="Web UI host (default: 127.0.0.1). Use 0.0.0.0 to allow LAN access.",
+    )
     parser.add_argument("--web-port", type=int, default=8000, help="Web UI port (default: 8000)")
     parser.add_argument("--version", action="store_true", help="Print version and exit")
     return parser
@@ -1217,6 +1225,11 @@ def run(args: argparse.Namespace) -> int:
                 )
                 return 2
 
+        if args.web_host == "0.0.0.0":
+            print(
+                "LAN hint: visit http://<your-lan-ip>:<port> from another device and allow macOS firewall access if prompted.",
+                file=sys.stderr,
+            )
         run_web(host=args.web_host, port=args.web_port)
         return 0
     if args.completion:

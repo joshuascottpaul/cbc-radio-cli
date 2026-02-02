@@ -15,6 +15,12 @@
         </p>
       </header>
 
+      {% if error %}
+        <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {{ error }}
+        </div>
+      {% endif %}
+
       <form method="post" action="/run" class="space-y-8">
         <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
           <h2 class="text-xl font-semibold mb-4">URL</h2>

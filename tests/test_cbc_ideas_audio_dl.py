@@ -61,6 +61,13 @@ class TestCbcIdeasDl(unittest.TestCase):
         reqs = req_path.read_text(encoding="utf-8")
         self.assertIn("python-multipart", reqs)
 
+    def test_requirements_brew_scope(self):
+        req_path = Path(__file__).resolve().parents[1] / "requirements-brew.txt"
+        reqs = req_path.read_text(encoding="utf-8")
+        for dep in ("fastapi", "uvicorn", "jinja2", "python-multipart"):
+            self.assertIn(dep, reqs)
+        self.assertNotIn("openai-whisper", reqs)
+
     def test_python_version_check(self):
         class DummyVer:
             major = 3

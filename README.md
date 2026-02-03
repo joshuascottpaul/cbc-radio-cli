@@ -4,6 +4,8 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Homebrew Tap](https://img.shields.io/badge/Homebrew-Tap-brightgreen.svg)](https://github.com/joshuascottpaul/homebrew-cbc-radio-cli)
 
+Mission: Make CBC audio instantly accessible—turn any CBC story or section URL into a clean, downloadable (and optionally transcribed) audio file with a single command, reliably and repeatably.
+
 Download CBC audio from CBC story or section URLs with one command. This tool resolves the correct podcast episode behind a story page, fetches the RSS enclosure URL, and hands it to `yt-dlp` so you get a clean audio file without digging through feeds or page HTML.
 
 First 60 seconds:
@@ -60,7 +62,7 @@ Optional (nice UI):
 - `alive-progress` (spinner fallback)
 - `yaspin` (spinner fallback)
 - `mutagen` (ID3 tagging)
-- `whisper` CLI (transcription)
+- `openai-whisper` (transcription, optional: `brew install openai-whisper`)
 - `ffmpeg` (required for clip transcription)
 
 ## Install (brew)
@@ -209,7 +211,7 @@ cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairn
 ## Troubleshooting
 - `Python 3.11+ is required`: upgrade your Python or install via Homebrew/pipx.
 - `ffmpeg not found`: install via `brew install ffmpeg`.
-- `whisper not found`: install `openai-whisper` (or use `requirements.txt`).
+- `whisper not found`: install `openai-whisper` (recommended: `brew install openai-whisper`).
 - `No RSS found`: try `--rss-url` or `--title` to help matching.
 - Web UI not reachable from another device: start with `--web-host 0.0.0.0`, use your Mac’s LAN IP (e.g. `http://192.168.x.x:8000`), and allow macOS firewall access if prompted.
 

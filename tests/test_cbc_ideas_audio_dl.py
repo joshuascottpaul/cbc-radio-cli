@@ -68,6 +68,12 @@ class TestCbcIdeasDl(unittest.TestCase):
             self.assertIn(dep, reqs)
         self.assertNotIn("openai-whisper", reqs)
 
+    def test_requirements_min_scope(self):
+        req_path = Path(__file__).resolve().parents[1] / "requirements-min.txt"
+        reqs = req_path.read_text(encoding="utf-8")
+        self.assertIn("rich", reqs)
+        self.assertNotIn("openai-whisper", reqs)
+
     def test_python_version_check(self):
         class DummyVer:
             major = 3
@@ -98,12 +104,17 @@ class TestCbcIdeasDl(unittest.TestCase):
                     return fn
                 return decorator
 
+            def mount(self, *args, **kwargs):
+                return None
+
         fastapi = types.SimpleNamespace(FastAPI=DummyApp, Request=object)
         responses = types.SimpleNamespace(JSONResponse=object, RedirectResponse=object)
         templating = types.SimpleNamespace(Jinja2Templates=lambda **kwargs: object())
+        staticfiles = types.SimpleNamespace(StaticFiles=lambda **kwargs: object())
         sys.modules["fastapi"] = fastapi
         sys.modules["fastapi.responses"] = responses
         sys.modules["fastapi.templating"] = templating
+        sys.modules["fastapi.staticfiles"] = staticfiles
         spec = importlib.util.spec_from_file_location(
             "cbc_radio_web",
             Path(__file__).resolve().parents[1] / "cbc_radio_web.py",
@@ -116,7 +127,7 @@ class TestCbcIdeasDl(unittest.TestCase):
         grouped = module._group_fields(fields)
         self.assertIn("basic", grouped)
         self.assertTrue(grouped["basic"])
-        for key in ("fastapi", "fastapi.responses", "fastapi.templating", "cbc_radio_web"):
+        for key in ("fastapi", "fastapi.responses", "fastapi.templating", "fastapi.staticfiles", "cbc_radio_web"):
             sys.modules.pop(key, None)
 
     def test_web_validate_section_requires_list(self):
@@ -137,12 +148,17 @@ class TestCbcIdeasDl(unittest.TestCase):
                     return fn
                 return decorator
 
+            def mount(self, *args, **kwargs):
+                return None
+
         fastapi = types.SimpleNamespace(FastAPI=DummyApp, Request=object)
         responses = types.SimpleNamespace(JSONResponse=object, RedirectResponse=object)
         templating = types.SimpleNamespace(Jinja2Templates=lambda **kwargs: object())
+        staticfiles = types.SimpleNamespace(StaticFiles=lambda **kwargs: object())
         sys.modules["fastapi"] = fastapi
         sys.modules["fastapi.responses"] = responses
         sys.modules["fastapi.templating"] = templating
+        sys.modules["fastapi.staticfiles"] = staticfiles
         spec = importlib.util.spec_from_file_location(
             "cbc_radio_web",
             Path(__file__).resolve().parents[1] / "cbc_radio_web.py",
@@ -170,7 +186,7 @@ class TestCbcIdeasDl(unittest.TestCase):
         )
         self.assertIsNone(error)
 
-        for key in ("fastapi", "fastapi.responses", "fastapi.templating", "cbc_radio_web"):
+        for key in ("fastapi", "fastapi.responses", "fastapi.templating", "fastapi.staticfiles", "cbc_radio_web"):
             sys.modules.pop(key, None)
 
 
@@ -672,6 +688,7 @@ class TestCliFlags(unittest.TestCase):
             return object()
 
         with mock.patch("importlib.import_module", side_effect=fake_import), \
+             mock.patch.object(cbc, "ensure_python_version", return_value=True), \
              mock.patch.object(cbc.Path, "exists", return_value=False):
             rc, _out, err = self.run_main(
                 ["cbc_ideas_audio_dl.py", "--web"],

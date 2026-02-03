@@ -114,6 +114,7 @@ Then open: `http://127.0.0.1:8000`
 
 Notes:
 - The web UI runs locally and calls the same CLI logic.
+- The web UI uses local CSS assets (no external CDN).
 - Interactive mode isn’t supported yet in the web UI (use list/summary or non-interactive flags).
 - You can set `--web-host` and `--web-port` if needed. For LAN access, use `--web-host 0.0.0.0` and open `http://<your-lan-ip>:8000` on another device (allow macOS firewall access if prompted).
 - If web deps are missing, the CLI will print a one‑liner install command.

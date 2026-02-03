@@ -4,83 +4,82 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>CBC Radio CLI — Web</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/style.css" />
   </head>
-  <body class="bg-slate-50 text-slate-900">
-    <div class="max-w-5xl mx-auto px-6 py-10">
-      <header class="mb-8">
-        <h1 class="text-3xl font-semibold">CBC Audio Downloader (Web)</h1>
-        <p class="text-slate-600 mt-2">
+  <body>
+    <div class="container">
+      <header class="header">
+        <h1 class="title">CBC Audio Downloader (Web)</h1>
+        <p class="subtitle">
           Runs locally and calls the same CLI logic. Fill in options you want; everything else uses defaults.
         </p>
       </header>
 
       {% if error %}
-        <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div class="error">
           {{ error }}
         </div>
       {% endif %}
 
       <form method="post" action="/run" class="space-y-8">
-        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-          <h2 class="text-xl font-semibold mb-4">URL</h2>
-          <label class="block text-sm font-medium text-slate-700 mb-2">CBC URL</label>
+        <section class="card">
+          <h2 class="section-title">URL</h2>
+          <label class="label">CBC URL</label>
           <input
             type="url"
             name="url"
             required
             placeholder="https://www.cbc.ca/radio/ideas/..."
-            class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            class="input"
           />
-          <p class="text-xs text-slate-500 mt-2">Paste a CBC story or section URL and click Run.</p>
+          <p class="muted">Paste a CBC story or section URL and click Run.</p>
         </section>
 
-        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-semibold">Options</h2>
-            <span class="text-sm text-slate-500">All CLI flags are available</span>
+        <section class="card">
+          <div class="header">
+            <h2 class="section-title">Options</h2>
+            <span class="muted">All CLI flags are available</span>
           </div>
 
-          <div class="flex flex-wrap gap-2 mb-6">
-            <button type="button" class="preset bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded text-sm" data-preset="resolve">
+          <div>
+            <button type="button" class="btn preset" data-preset="resolve">
               Resolve only
             </button>
-            <button type="button" class="preset bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded text-sm" data-preset="download">
+            <button type="button" class="btn preset" data-preset="download">
               Download (default)
             </button>
-            <button type="button" class="preset bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded text-sm" data-preset="transcribe">
+            <button type="button" class="btn preset" data-preset="transcribe">
               Download + transcribe
             </button>
-            <button type="button" class="preset bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded text-sm" data-preset="browse">
+            <button type="button" class="btn preset" data-preset="browse">
               Browse section
             </button>
           </div>
 
-          <div class="space-y-6">
+          <div class="grid" style="margin-top: 16px;">
             {% for group_name, group_fields in groups.items() %}
-              <details class="rounded-lg border border-slate-200 p-4" {% if group_name == "basic" %}open{% endif %}>
-                <summary class="cursor-pointer font-medium text-slate-800 capitalize">{{ group_name }}</summary>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+              <details class="details" {% if group_name == "basic" %}open{% endif %}>
+                <summary class="label">{{ group_name }}</summary>
+                <div class="grid" style="margin-top: 12px;">
                   {% for field in group_fields %}
                     <div>
-                      <label class="block text-sm font-medium text-slate-700 mb-1">
+                      <label class="label">
                         {{ field.label }}
-                        <span class="ml-2 text-xs text-slate-400 font-mono">{{ field.option }}</span>
+                        <span class="muted" style="margin-left: 8px;">{{ field.option }}</span>
                       </label>
                       {% if field.kind == "checkbox" %}
-                        <label class="inline-flex items-center gap-2">
+                        <label class="muted">
                           <input
                             type="checkbox"
                             name="{{ field.name }}"
                             value="1"
-                            class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                           />
-                          <span class="text-sm text-slate-600">{{ field.help }}</span>
+                          <span>{{ field.help }}</span>
                         </label>
                       {% elif field.kind == "select" %}
                         <select
                           name="{{ field.name }}"
-                          class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          class="input"
                         >
                           <option value="">(default)</option>
                           {% for choice in field.choices %}
@@ -88,17 +87,17 @@
                           {% endfor %}
                         </select>
                         {% if field.help %}
-                          <p class="text-xs text-slate-500 mt-1">{{ field.help }}</p>
+                          <p class="muted">{{ field.help }}</p>
                         {% endif %}
                       {% else %}
                         <input
                           type="{{ field.kind }}"
                           name="{{ field.name }}"
                           placeholder="{{ field.placeholder }}"
-                          class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          class="input"
                         />
                         {% if field.help %}
-                          <p class="text-xs text-slate-500 mt-1">{{ field.help }}</p>
+                          <p class="muted">{{ field.help }}</p>
                         {% endif %}
                       {% endif %}
                     </div>
@@ -109,16 +108,16 @@
           </div>
         </section>
 
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-          <div class="text-xs text-slate-500 mb-2">CLI preview</div>
-          <pre id="cli-preview" class="text-xs text-slate-800 whitespace-pre-wrap font-mono"></pre>
+        <div class="card">
+          <div class="muted">CLI preview</div>
+          <pre id="cli-preview" class="output"></pre>
         </div>
 
-        <div class="flex items-center gap-3">
-          <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-indigo-700">
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <button type="submit" class="btn btn-primary">
             Run
           </button>
-          <a href="/jobs" class="text-sm text-indigo-600 hover:underline">View recent runs</a>
+          <a href="/jobs" class="btn-link">View recent runs</a>
         </div>
       </form>
     </div>

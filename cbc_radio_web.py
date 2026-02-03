@@ -12,6 +12,7 @@ from typing import Any
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 def _ensure_python_version(min_major: int = 3, min_minor: int = 11) -> None:
@@ -76,6 +77,21 @@ if _template_dir is None:
 
 TEMPLATES = Jinja2Templates(directory=str(_template_dir))
 
+_STATIC_CANDIDATES = [
+    _SCRIPT_DIR / "web" / "static",
+    _SCRIPT_DIR / "static",
+    _SCRIPT_DIR / ".." / "share" / "cbc-radio-cli" / "static",
+    Path("/opt/homebrew/share/cbc-radio-cli/static"),
+    Path("/usr/local/share/cbc-radio-cli/static"),
+]
+_static_dir = None
+for path in _STATIC_CANDIDATES:
+    if path.exists():
+        _static_dir = path
+        break
+if _static_dir is None:
+    raise RuntimeError("Static directory not found. Reinstall cbc-radio-cli.")
+
 
 @dataclass
 class Job:
@@ -90,6 +106,7 @@ class Job:
 app = FastAPI(title="CBC Radio CLI Web")
 _jobs: dict[str, Job] = {}
 _jobs_lock = threading.Lock()
+app.mount("/static", StaticFiles(directory=str(_static_dir)), name="static")
 
 
 _LABELS = {

@@ -4,33 +4,33 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Recent runs</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/style.css" />
   </head>
-  <body class="bg-slate-50 text-slate-900">
-    <div class="max-w-4xl mx-auto px-6 py-10">
-      <header class="mb-6">
-        <h1 class="text-2xl font-semibold">Recent runs</h1>
-        <p class="text-slate-600 mt-1">Latest jobs run from the web UI.</p>
+  <body>
+    <div class="container">
+      <header class="header">
+        <h1 class="title">Recent runs</h1>
+        <p class="subtitle">Latest jobs run from the web UI.</p>
       </header>
 
-      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-        <ul class="divide-y divide-slate-100">
+      <div class="card">
+        <ul>
           {% for job in jobs %}
-            <li class="py-3 flex items-center justify-between">
+            <li style="padding: 12px 0; border-bottom: 1px solid #e2e8f0; display:flex; align-items:center; justify-content:space-between;">
               <div>
-                <div class="font-mono text-sm">{{ job.id }}</div>
-                <div class="text-xs text-slate-500">{{ job.status }}</div>
+                <div class="muted" style="font-family: ui-monospace, SFMono-Regular, Menlo, monospace;">{{ job.id }}</div>
+                <div class="muted">{{ job.status }}</div>
               </div>
-              <a href="/job/{{ job.id }}" class="text-sm text-indigo-600 hover:underline">View</a>
+              <a href="/job/{{ job.id }}" class="btn-link">View</a>
             </li>
           {% else %}
-            <li class="py-3 text-sm text-slate-500">No runs yet.</li>
+            <li class="muted" style="padding: 12px 0;">No runs yet.</li>
           {% endfor %}
         </ul>
       </div>
 
-      <div class="mt-4">
-        <a href="/" class="text-sm text-indigo-600 hover:underline">New run</a>
+      <div style="margin-top:16px;">
+        <a href="/" class="btn-link">New run</a>
       </div>
     </div>
   </body>

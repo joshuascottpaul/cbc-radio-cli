@@ -70,6 +70,10 @@ Optional (nice UI):
 brew tap joshuascottpaul/cbc-radio-cli
 brew install cbc-radio-cli
 ```
+Homebrew now vendors all Python runtime dependencies except `openai-whisper`. Install whisper separately if you want transcription:
+```bash
+brew install openai-whisper
+```
 
 Then run:
 ```bash
@@ -99,6 +103,7 @@ cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairn
 ```
 
 Note: `requirements.txt` includes optional tools (UI, tagging, whisper). Use `requirements-min.txt` to skip whisper.
+Note: Web UI deps live in `requirements-web.txt`, and Homebrew vendors a unified `requirements-brew.txt` (excluding whisper).
 
 ## Web UI (local)
 Run a local web UI that stays in sync with CLI options:
@@ -428,11 +433,7 @@ cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairn
 
 ## Tests
 ```bash
-pytest -q
-```
-If you don’t have `pytest` installed, use:
-```bash
-brew install pytest
+python3 -m unittest discover -s tests
 ```
 
 ## Homebrew release flow (maintainers)

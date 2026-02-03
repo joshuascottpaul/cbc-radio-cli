@@ -209,7 +209,7 @@ def fetch_bytes(url: str) -> bytes:
 
 
 def extract_initial_state(html: str) -> dict:
-    m = re.search(r"window.__INITIAL_STATE__ = (\{.*?\});\s*</script>", html)
+    m = re.search(r"window.__INITIAL_STATE__ = (\{.*?\});\s*</script>", html, re.DOTALL)
     if not m:
         raise ValueError("Could not find window.__INITIAL_STATE__ in HTML")
     text = m.group(1)
@@ -903,22 +903,6 @@ def prompt_action() -> tuple[bool, bool, bool]:
             return False, False, False
         if choice in {"c", "cancel"}:
             return False, False, True
-        if choice in {"n", "next"}:
-            if (page + 1) * page_size < total:
-                page += 1
-            continue
-        if choice in {"p", "prev"}:
-            if page > 0:
-                page -= 1
-            continue
-        try:
-            num = int(choice)
-            start = page * page_size
-            end = min(start + page_size, total)
-            if 1 <= num <= (end - start):
-                return items_sorted[start + num - 1]
-        except Exception:
-            continue
 
 
 def run_ytdlp(cmd: list[str], use_live: bool) -> int:

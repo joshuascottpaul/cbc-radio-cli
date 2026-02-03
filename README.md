@@ -119,6 +119,10 @@ Notes:
 - You can set `--web-host` and `--web-port` if needed. For LAN access, use `--web-host 0.0.0.0` and open `http://<your-lan-ip>:8000` on another device (allow macOS firewall access if prompted).
 - If web deps are missing, the CLI will print a one‑liner install command.
 
+UI CSS build placeholder:
+- `scripts/build-css.sh` is a placeholder for future Tailwind or build pipeline adoption.
+- Rationale: keep the local UI stable and dependency-free now; add a build step only when the UI grows.
+
 Venv setup (recommended on Homebrew Python):
 ```bash
 python3 -m venv ~/.venvs/cbc-radio-cli

@@ -35,6 +35,37 @@ cbc-radio-cli https://www.cbc.ca/radio/ideas/canadian-court-system-lawyers-fairn
 
 Homebrew tap repo: https://github.com/joshuascottpaul/homebrew-cbc-radio-cli
 
+
+## Installation
+
+### Quick Install with Package Managers
+
+**Using [ubi](https://github.com/houseabsolute/ubi):**
+```bash
+ubi --project joshuascottpaul/cbc-radio-cli --in ~/.local/bin
+```
+
+**Using [bin](https://github.com/marcosnils/bin):**
+```bash
+bin install github.com/joshuascottpaul/cbc-radio-cli
+```
+
+### Manual Install
+
+```bash
+git clone https://github.com/joshuascottpaul/cbc-radio-cli.git
+cd cbc-radio-cli
+pip install -r requirements.txt  # if requirements.txt exists
+```
+
+### From Release
+
+```bash
+curl -L https://github.com/joshuascottpaul/cbc-radio-cli/releases/latest/download/cbc-radio-cli-v0.1.0-darwin-arm64.tar.gz | tar xz
+cd cbc-radio-cli-darwin-arm64
+./install.sh
+```
+
 ## Table of contents
 - [Requirements](#requirements)
 - [Install (brew)](#install-brew)
